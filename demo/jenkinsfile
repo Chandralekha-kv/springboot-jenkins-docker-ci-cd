@@ -14,25 +14,31 @@ pipeline {
         }
 
         stage('Build') {
-            steps {
-                bat 'mvn clean package'
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                bat 'docker build -t my-app .'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                bat '''
-                docker stop my-app || exit 0
-                docker rm my-app || exit 0
-                docker run -d -p 8082:8080 --name my-app my-app
-                '''
-            }
+    steps {
+        dir('demo') {
+            bat 'mvn clean package'
         }
     }
+}
+
+        stage('Docker Build') {
+    steps {
+        dir('demo') {
+            bat 'docker build -t my-app .'
+        }
+    }
+}
+
+        stage('Deploy') {
+    steps {
+        dir('demo') {
+            bat '''
+            docker stop my-app || exit 0
+            docker rm my-app || exit 0
+            docker run -d -p 8082:8080 --name my-app my-app
+            '''
+        }
+      }
+    }
+  }
 }
